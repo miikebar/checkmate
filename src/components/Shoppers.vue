@@ -1,7 +1,7 @@
 <template>
-  <Card class="shoppers" title="Shoppers">
+  <Card class="shoppers" title="Shopping Buddies">
     <form @submit.prevent="insert()" class="shoppers__form" action="#">
-      <input class="shoppers__name" type="text" v-model="name" placeholder="Shopper name" required>
+      <input class="shoppers__name" type="text" v-model="name" placeholder="Your shopping buddy's name" required>
       <button class="button">
         <i class="fas fa-plus"></i>
       </button>
