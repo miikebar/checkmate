@@ -24,6 +24,7 @@
 import Card from '@/components/Card'
 import Receipt from '@/models/Receipt'
 import Shopper from '@/models/Shopper'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'shoppers',
@@ -52,33 +53,17 @@ export default {
     }
   },
   methods: {
-    insert () {
-      Receipt.insert({
-        data: {
-          shoppers: [
-            {
-              id: this.nextId++,
-              name: this.name
-            }
-          ]
-        }
-      })
+    ...mapActions([
+      'createShopper',
+      'removeShopper'
+    ]),
 
+    insert () {
+      this.createShopper(this.name)
       this.name = null
     },
-    remove (shopperToRemove) {
-      const receipts = Receipt.query().with('shoppers').has('shoppers', '<', 3).get()
-
-      receipts.forEach(receipt => {
-        receipt.shoppers.forEach(shopper => {
-          if (shopper.id === shopperToRemove.id) {
-            Receipt.delete(receipt.id)
-          }
-        })
-      })
-
-      Shopper.delete(shopperToRemove.id)
-
+    remove (shopper) {
+      this.removeShopper(shopper.id)
     }
   }
 }

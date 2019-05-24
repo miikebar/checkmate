@@ -1,5 +1,5 @@
 <template>
-  <Card class="receipt" :title="title">
+  <Card class="receipt" :title="title" :closeable="isShared" @close="deleteReceipt()">
     <form @submit.prevent="insert()" class="receipt__form" action="#">
       <input class="receipt__cash" min="0" step="0.01" type="number" v-model="cash" placeholder="Cash amount" required>
       <button class="button">
@@ -34,6 +34,7 @@
 import Card from '@/components/Card'
 import Shopper from '@/models/Shopper'
 import Receipt from '@/models/Receipt'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'receipt-card',
@@ -84,17 +85,33 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'addCashToReceipt',
+      'removeCashFromReceipt',
+      'removeReceipt'
+    ]),
+
     insert () {
-      Receipt.update({
-        where: this.receipt.id,
-        data: {
-          items: [...this.receipt.items, parseFloat(this.cash)]
-        }
+      this.addCashToReceipt({
+        cash: this.cash,
+        receipt: this.receipt
       })
+
       this.cash = null
     },
+
     remove (index) {
-      this.receipt.items = this.receipt.items.splice(index, 1)
+      this.removeCashFromReceipt({
+        cashIndex: index,
+        receipt: this.receipt
+      })
+    },
+
+    deleteReceipt () {
+      console.log('DELET DIS')
+      this.removeReceipt({
+        id: this.receipt.id
+      })
     }
   }
 }

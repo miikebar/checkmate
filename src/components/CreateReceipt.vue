@@ -1,29 +1,28 @@
 <template>
   <div class="create">
     <transition
-      enter-active-class="animated flipInY">
-    <Card v-if="!creating" class="create__waiting" key="waiting">
-      <button  @click="start()" class="create__button">
-        <i class="fas fa-plus"></i> New shared receipt
-      </button>
-    </Card>
-    <Card class="create__creating" v-else :title="title" key="creating">
-      <div class="create__form">
-        <button @click="close()" class="create__close">
-          <div class="fas fa-times"></div>
+      enter-active-class="animated animate-quick fadeIn"
+      leave-active-class="animated animate-quick fadeOut"
+      mode="out-in">
+      <Card v-if="!creating" class="create__waiting" key="waiting">
+        <button  @click="start()" class="create__button">
+          <i class="fas fa-plus"></i> New shared receipt
         </button>
-        <span class="create__about">Select at least two shoppers you wish to create a shared receipt for.</span>
-        <form action="#">
-          <div class="create__shopper" v-for="shopper in shoppers" :key="shopper.id">
-            <input :id="shopper.id" class="checkbox" :value="shopper.id" v-model="checkedShoppers" type="checkbox">
-            <label :for="shopper.id">{{ shopper.name }}</label>
+      </Card>
+      <Card class="create__creating" v-else :title="title" closeable="true" @close="close()" key="creating">
+        <div class="create__form">
+          <span class="create__about">Select at least two shoppers you wish to create a shared receipt for.</span>
+          <form action="#">
+            <div class="create__shopper" v-for="shopper in shoppers" :key="shopper.id">
+              <input :id="shopper.id" class="checkbox" :value="shopper.id" v-model="checkedShoppers" type="checkbox">
+              <label :for="shopper.id">{{ shopper.name }}</label>
+            </div>
+          </form>
+          <div class="create__actions">
+            <button :disabled="!allow" class="button" @click="create()">Create</button>
           </div>
-        </form>
-        <div class="create__actions">
-          <button :disabled="!allow" class="button" @click="create()">Create</button>
         </div>
-      </div>
-    </Card>
+      </Card>
     </transition>
   </div>
 </template>
@@ -32,6 +31,7 @@
 import Card from '@/components/Card'
 import Shopper from '@/models/Shopper'
 import Receipt from '@/models/Receipt'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'create-receipt',
@@ -53,12 +53,12 @@ export default {
     },
     allow () {
       return this.checkedShoppers.length > 1
-    },
-    enterAnimation () {
-      // return 'animated ' + (this.creating ? 'flipInY' : 'flipOutY')
     }
   },
   methods: {
+    ...mapActions([
+      'createReceipt'
+    ]),
     start () {
       this.creating = true
     },
@@ -67,20 +67,7 @@ export default {
       this.checkedShoppers = []
     },
     create () {
-      const shoppers = this.checkedShoppers.map(id => {
-        const shopper = Shopper.find(id)
-        return {
-          id: shopper.id,
-          name: shopper.name
-        }
-      })
-
-      Receipt.insert({
-        data: {
-          shoppers
-        }
-      })
-
+      this.createReceipt(this.checkedShoppers)
       this.checkedShoppers = []
       this.creating = false
     }
@@ -117,10 +104,18 @@ export default {
     width: 100%;
     height: 100%;
     transition: all .2s ease-in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__button:hover {
     color: rgba(#fff, .8);
+  }
+
+  &__button .fas {
+    font-size: 16px;
+    margin-right: 16px;
   }
 
   &__waiting .card__content {
@@ -185,5 +180,9 @@ export default {
     color: rgba(#000, .5);
   }
 
+}
+
+.animate-quick {
+  animation-duration: .2s;
 }
 </style>
