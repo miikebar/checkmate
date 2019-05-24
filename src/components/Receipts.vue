@@ -1,7 +1,8 @@
 <template>
   <transition-group
     enter-active-class="animated flipInY"
-    leave-active-class="animation-exit"
+    leave-active-class="animated hinge"
+    @before-leave="beforeLeave"
     move-class="move"
     tag="div"
     class="receipts">
@@ -28,6 +29,17 @@ export default {
     },
     receipts () {
       return Receipt.query().with('shoppers').all()
+    }
+  },
+  methods: {
+    beforeLeave(el) {
+      const {marginLeft, marginTop, width, height} = window.getComputedStyle(el)
+      el.style.left = `${el.offsetLeft - parseFloat(marginLeft, 10)}px`
+      el.style.top = `${el.offsetTop - parseFloat(marginTop, 10)}px`
+      el.style.width = width
+      el.style.height = height
+      el.style.position = 'absolute'
+      el.style.animationDelay = 0
     }
   }
 }
@@ -58,5 +70,11 @@ export default {
 
 .delayed {
   animation-delay: .5s;
+}
+
+.delayed.v-leave-active,
+.delayed.v-leave,
+.delayed.v-leave-to {
+  display: none;
 }
 </style>

@@ -1,11 +1,10 @@
 <template>
   <div class="create">
     <transition
-      enter-active-class="animated fadeIn"
-      leave-active-class="animation-exit">
+      enter-active-class="animated flipInY">
     <Card v-if="!creating" class="create__waiting" key="waiting">
       <button  @click="start()" class="create__button">
-        <i class="fas fa-plus"></i>
+        <i class="fas fa-plus"></i> New shared receipt
       </button>
     </Card>
     <Card class="create__creating" v-else :title="title" key="creating">
@@ -54,6 +53,9 @@ export default {
     },
     allow () {
       return this.checkedShoppers.length > 1
+    },
+    enterAnimation () {
+      // return 'animated ' + (this.creating ? 'flipInY' : 'flipOutY')
     }
   },
   methods: {
@@ -182,5 +184,6 @@ export default {
   &__close:hover {
     color: rgba(#000, .5);
   }
+
 }
 </style>
